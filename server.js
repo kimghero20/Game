@@ -1,16 +1,20 @@
+const express = require("express");
+const http = require("http");
+const socketIO = require("socket.io");
 
-const express = require('express');
 const app = express();
-const http = require('http').createServer(app);
-const io = require('socket.io')(http);
+const server = http.createServer(app);
+const io = socketIO(server);
 
-app.use(express.static(__dirname));
+io.on("connection", (socket) => {
+  console.log("Bir oyuncu bağlandı");
 
-io.on('connection', (socket) => {
-  console.log('User connected');
-  socket.on('join', (data) => console.log('Joined:', data));
+  socket.on("disconnect", () => {
+    console.log("Oyuncu ayrıldı");
+  });
 });
 
-http.listen(3000, () => {
-  console.log('Server started on http://localhost:3000');
+const port = process.env.PORT || 3000;
+server.listen(port, () => {
+  console.log(`Sunucu ${port} portunda çalışıyor`);
 });
